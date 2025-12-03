@@ -1,0 +1,560 @@
+/* ==== GLOBAL PAGE STYLES ==== */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', Arial, sans-serif;
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    min-height: 100vh;
+    height: auto;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    color: #fff;
+}
+
+/* ===== FLOATING BOOKS ANIMATION ===== */
+.book {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background-image: url('https://cdn-icons-png.flaticon.com/512/29/29302.png');
+    background-size: cover;
+    opacity: 0.23;
+    animation: floatBooks 14s infinite linear;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.book:nth-child(1) { left: 10%; animation-duration: 12s; }
+.book:nth-child(2) { left: 28%; animation-duration: 15s; }
+.book:nth-child(3) { left: 50%; animation-duration: 11s; }
+.book:nth-child(4) { left: 72%; animation-duration: 16s; }
+.book:nth-child(5) { left: 90%; animation-duration: 10s; }
+
+@keyframes floatBooks {
+    0% { transform: translateY(100vh) rotate(0deg); }
+    100% { transform: translateY(-130vh) rotate(360deg); }
+}
+
+/* ===== MAIN WRAPPER ===== */
+.main-container {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    margin-top: 80px;
+    margin-bottom: 80px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ===== HEADER ===== */
+.header h1 {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+.header p {
+    font-size: 15px;
+    letter-spacing: 0.5px;
+    color: #eaeaea;
+    margin-bottom: 25px;
+}
+
+/* ===== FORM DESIGN ===== */
+form {
+    background: rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(18px);
+    border-radius: 20px;
+    padding: 35px 30px;
+    width: 420px;
+    max-width: 90%;
+    box-shadow: 0 20px 45px rgba(0,0,0,0.35);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.9s ease-out;
+    position: relative;
+    z-index: 100;
+}
+
+/* Fade In Animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Form group styling */
+.form-group {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 6px;
+}
+
+.required {
+    color: #ff4757;
+}
+
+.hint {
+    display: block;
+    font-size: 12px;
+    color: #e0e0e0;
+    margin-top: 4px;
+    font-style: italic;
+}
+
+/* Input Fields */
+input[type="text"],
+input[type="date"],
+input[type="tel"] {
+    width: 100%;
+    padding: 12px;
+    margin-top: 2px;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.95);
+    outline: none;
+    font-size: 15px;
+    transition: 0.3s ease;
+    box-sizing: border-box;
+}
+
+input[type="text"]:focus,
+input[type="date"]:focus,
+input[type="tel"]:focus {
+    box-shadow: 0 0 9px rgba(37, 117, 252, 0.9);
+    transform: scale(1.02);
+}
+
+/* ===== PHOTO UPLOAD SECTION ===== */
+.photo-section {
+    margin: 15px 0;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.photo-section label {
+    display: block;
+    margin-bottom: 12px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.photo-container {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.photo-preview {
+    width: 100px;
+    height: 100px;
+    min-width: 100px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 3px solid #2575fc;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+.photo-preview .default-avatar {
+    font-size: 60px;
+    color: #6a11cb;
+}
+
+.photo-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: photoFadeIn 0.3s ease-out;
+}
+
+@keyframes photoFadeIn {
+    from { opacity: 0; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.upload-options {
+    flex: 1;
+    min-width: 200px;
+}
+
+.upload-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+#photoUpload {
+    display: none;
+}
+
+.upload-btn, .capture-btn, .remove-btn {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex: 1;
+    min-width: 100px;
+}
+
+.upload-btn {
+    background: #2575fc;
+    color: white;
+}
+
+.upload-btn:hover {
+    background: #6a11cb;
+    transform: translateY(-2px);
+}
+
+.capture-btn {
+    background: #00c896;
+    color: white;
+}
+
+.capture-btn:hover {
+    background: #009f74;
+    transform: translateY(-2px);
+}
+
+.remove-btn {
+    background: #ff4757;
+    color: white;
+    width: 100%;
+    margin-top: 5px;
+}
+
+.remove-btn:hover {
+    background: #ff3838;
+    transform: translateY(-2px);
+}
+
+.photo-hint {
+    font-size: 11px;
+    color: #e0e0e0;
+    margin-top: 8px;
+    line-height: 1.4;
+    opacity: 0.9;
+}
+
+/* ===== BUTTONS ===== */
+.button-group {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+#submitBtn {
+    width: 100%;
+    padding: 14px;
+    background: #2575fc;
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    transition: 0.35s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+#submitBtn:hover {
+    background: #6a11cb;
+    transform: scale(1.05);
+}
+
+#downloadBtn {
+    width: 100%;
+    padding: 14px;
+    background: #00c896;
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: 0.3s;
+}
+
+#downloadBtn:hover {
+    background: #009f74;
+    transform: scale(1.05);
+}
+
+/* ===== PREVIEW CONTAINER ===== */
+#previewContainer {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    padding: 25px;
+    width: 420px;
+    max-width: 90%;
+    margin-top: 30px;
+    animation: fadeIn 0.9s ease-out;
+}
+
+#previewContainer h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+/* ID Card Preview */
+#idCardPreview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    color: #333;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.preview-photo {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin-bottom: 20px;
+    border: 3px solid #2575fc;
+}
+
+.preview-photo .default-avatar {
+    font-size: 60px;
+    color: #6a11cb;
+}
+
+.preview-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.preview-details {
+    width: 100%;
+    text-align: left;
+}
+
+.preview-details h4 {
+    color: #2575fc;
+    border-bottom: 2px solid #2575fc;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 18px;
+}
+
+.preview-details p {
+    margin: 10px 0;
+    font-size: 14px;
+    padding-left: 15px;
+}
+
+.preview-details .label {
+    font-weight: 600;
+    color: #6a11cb;
+    display: inline-block;
+    width: 100px;
+}
+
+/* ===== CAMERA MODAL ===== */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 500px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+}
+
+.modal-header {
+    background: #2575fc;
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.close-modal {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+}
+
+.close-modal:hover {
+    transform: scale(1.2);
+}
+
+.modal-body {
+    padding: 20px;
+    text-align: center;
+}
+
+#cameraFeed {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 10px;
+    background: #000;
+}
+
+#photoCanvas {
+    max-width: 100%;
+    border-radius: 10px;
+    display: none;
+}
+
+.modal-footer {
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    background: #f5f5f5;
+}
+
+.cancel-btn {
+    background: #ff4757;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+}
+
+.cancel-btn:hover {
+    background: #ff3838;
+    transform: translateY(-2px);
+}
+
+/* ===== UTILITY CLASSES ===== */
+.hidden {
+    display: none;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 480px) {
+    form, #previewContainer {
+        width: 95%;
+        padding: 25px 20px;
+    }
+    
+    .header h1 {
+        font-size: 28px;
+    }
+    
+    .photo-container {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 15px;
+    }
+    
+    .upload-options {
+        width: 100%;
+    }
+    
+    .upload-buttons {
+        justify-content: center;
+    }
+    
+    .upload-btn, .capture-btn {
+        min-width: 120px;
+    }
+    
+    .photo-preview {
+        width: 90px;
+        height: 90px;
+    }
+    
+    .preview-photo {
+        width: 90px;
+        height: 90px;
+    }
+}

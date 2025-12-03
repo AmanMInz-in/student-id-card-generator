@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student ID Card Form</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Floating Books -->
+    <div class="book"></div>
+    <div class="book"></div>
+    <div class="book"></div>
+    <div class="book"></div>
+    <div class="book"></div>
+
+    <!-- Main Content Container -->
+    <div class="main-container">
+        <div class="header">
+            <h1><i class="fas fa-id-card"></i> Student ID Card Generator</h1>
+            <p><u>Note: This Form Must Be Filled Correctly Without Any Mistake</u></p>
+        </div>
+
+        <form id="studentForm">
+            <div class="form-group">
+                <label for="firstName">First Name <span class="required">*</span></label>
+                <input type="text" id="firstName" placeholder="Enter first name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="middleName">Middle Name</label>
+                <input type="text" id="middleName" placeholder="Enter middle name">
+            </div>
+            
+            <div class="form-group">
+                <label for="lastName">Last Name <span class="required">*</span></label>
+                <input type="text" id="lastName" placeholder="Enter last name" required>
+            </div>
+            
+            <!-- Photo Upload Section - Placed after Last Name -->
+            <div class="form-group photo-section">
+                <label>Passport Photo <span class="required">*</span></label>
+                <div class="photo-container">
+                    <div class="photo-preview" id="photoPreview">
+                        <i class="fas fa-user-circle default-avatar"></i>
+                        <img id="photoImage" class="hidden" alt="Student Photo">
+                    </div>
+                    <div class="upload-options">
+                        <div class="upload-buttons">
+                            <label for="photoUpload" class="upload-btn">
+                                <i class="fas fa-upload"></i> Upload
+                            </label>
+                            <input type="file" id="photoUpload" accept="image/*">
+                            <button type="button" id="captureBtn" class="capture-btn">
+                                <i class="fas fa-camera"></i> Camera
+                            </button>
+                        </div>
+                        <button type="button" id="removePhotoBtn" class="remove-btn hidden">
+                            <i class="fas fa-trash"></i> Remove Photo
+                        </button>
+                        <p class="photo-hint">2x2 inch • Max 2MB • JPG/PNG</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="dob">Date of Birth <span class="required">*</span></label>
+                <input type="date" id="dob" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Phone Number <span class="required">*</span></label>
+                <input type="tel" id="phone" placeholder="Enter phone number" pattern="[0-9]{10}" required>
+                <small class="hint">10 digits only (no dashes or spaces)</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="address">Address <span class="required">*</span></label>
+                <input type="text" id="address" placeholder="Enter full address" required>
+            </div>
+            
+            <div class="button-group">
+                <button type="submit" id="submitBtn"><i class="fas fa-check-circle"></i> Submit Form</button>
+                <button type="button" id="downloadBtn"><i class="fas fa-download"></i> Download ID Card</button>
+            </div>
+        </form>
+        
+        <div id="previewContainer" class="hidden">
+            <h3><i class="fas fa-eye"></i> ID Card Preview</h3>
+            <div id="idCardPreview">
+                <div class="preview-photo" id="previewPhoto">
+                    <i class="fas fa-user-circle default-avatar"></i>
+                    <img id="previewPhotoImage" class="hidden" alt="Student Photo">
+                </div>
+                <div class="preview-details" id="previewDetails"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Camera Modal -->
+    <div id="cameraModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-camera"></i> Take Photo</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <video id="cameraFeed" autoplay playsinline></video>
+                <canvas id="photoCanvas" class="hidden"></canvas>
+            </div>
+            <div class="modal-footer">
+                <button id="capturePhotoBtn" class="capture-btn">
+                    <i class="fas fa-camera"></i> Capture Photo
+                </button>
+                <button id="cancelCaptureBtn" class="cancel-btn">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
