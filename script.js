@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
+    // Get DOM elements
     const form = document.getElementById("studentForm");
     const submitBtn = document.getElementById("submitBtn");
     const downloadBtn = document.getElementById("downloadBtn");
@@ -20,7 +21,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const cancelCaptureBtn = document.getElementById("cancelCaptureBtn");
     const closeModalBtn = document.querySelector(".close-modal");
     
+    // Data storage
     let formData = {
+        firstName: "",
+        middleName: "",
+        lastName: "",
+        dob: "",
+        phone: "",
+        address: "",
         photoDataUrl: null
     };
     let studentId = "";
@@ -33,11 +41,12 @@ document.addEventListener("DOMContentLoaded", function () {
         return `STU${year}${randomNum}`;
     }
     
-    // Handle photo upload
+    // Handle photo upload from file input
     photoUpload.addEventListener("change", function(e) {
         handlePhotoFile(e.target.files[0]);
     });
     
+    // Process photo file
     function handlePhotoFile(file) {
         if (!file) return;
         
@@ -60,6 +69,7 @@ document.addEventListener("DOMContentLoaded", function () {
         reader.readAsDataURL(file);
     }
     
+    // Update photo preview in form and preview section
     function updatePhotoPreview(dataUrl) {
         formData.photoDataUrl = dataUrl;
         photoImage.src = dataUrl;
@@ -67,7 +77,7 @@ document.addEventListener("DOMContentLoaded", function () {
         document.querySelector('#photoPreview .default-avatar').classList.add("hidden");
         removePhotoBtn.classList.remove("hidden");
         
-        // Update preview
+        // Update preview section
         previewPhotoImage.src = dataUrl;
         previewPhotoImage.classList.remove("hidden");
         document.querySelector('#previewPhoto .default-avatar').classList.add("hidden");
@@ -134,7 +144,7 @@ document.addEventListener("DOMContentLoaded", function () {
     closeModalBtn.addEventListener("click", closeCamera);
     cancelCaptureBtn.addEventListener("click", closeCamera);
     
-    // Update preview
+    // Update ID card preview
     function updatePreview() {
         const fullName = `${formData.firstName || ''} ${formData.middleName || ''} ${formData.lastName || ''}`.trim().replace(/\s+/g, ' ');
         
@@ -200,7 +210,7 @@ document.addEventListener("DOMContentLoaded", function () {
         previewContainer.scrollIntoView({ behavior: 'smooth' });
     });
     
-    // Handle PDF download with photo
+    // Handle PDF download with photo - FIXED VERSION (NO OVERLAPPING)
     downloadBtn.addEventListener("click", function () {
         // Check if form is submitted
         if (!studentId) {
@@ -210,117 +220,125 @@ document.addEventListener("DOMContentLoaded", function () {
         
         const { jsPDF } = window.jspdf;
         
-        // Use A6 size for ID card
-        const doc = new jsPDF('p', 'mm', 'a6'); // A6 is perfect for ID cards
+        // Use A6 size (105x148mm) - perfect for ID cards
+        const doc = new jsPDF('p', 'mm', 'a6');
         
-        const fullName = `${formData.firstName} ${formData.middleName} ${formData.lastName}`.trim().replace(/\s+/g, ' ');
+        const fullName = `${formData.firstName} ${formData.middleName} ${formData.lastName}`.trim();
         
-        // Get page dimensions
-        const pageWidth = doc.internal.pageSize.getWidth();  // 105mm for A6
-        const pageHeight = doc.internal.pageSize.getHeight(); // 148mm for A6
+        // Fixed dimensions for A6
+        const pageWidth = 105;
+        const pageHeight = 148;
         const centerX = pageWidth / 2;
         
-        // Add blue background
+        // Blue background
         doc.setFillColor(37, 117, 252);
         doc.rect(0, 0, pageWidth, pageHeight, 'F');
         
-        // Create white ID card (centered)
-        const cardWidth = 90;
-        const cardHeight = 125;
+        // White ID card - centered with safe margins
+        const cardWidth = 85;
+        const cardHeight = 100;
         const cardX = (pageWidth - cardWidth) / 2;
         const cardY = (pageHeight - cardHeight) / 2;
         
         doc.setFillColor(255, 255, 255);
-        doc.roundedRect(cardX, cardY, cardWidth, cardHeight, 8, 8, 'F');
+        doc.roundedRect(cardX, cardY, cardWidth, cardHeight, 5, 5, 'F');
         
-        // Header
+        // Title - TOP SECTION
         doc.setTextColor(37, 117, 252);
-        doc.setFontSize(18);
+        doc.setFontSize(16);
         doc.setFont("helvetica", "bold");
-        doc.text("STUDENT ID", centerX, cardY + 15, { align: 'center' });
+        doc.text("STUDENT ID", centerX, cardY + 10, { align: 'center' });
         
-        // Horizontal line
+        // Divider line
         doc.setDrawColor(37, 117, 252);
-        doc.setLineWidth(0.8);
-        doc.line(cardX + 15, cardY + 22, cardX + cardWidth - 15, cardY + 22);
+        doc.setLineWidth(0.5);
+        doc.line(cardX + 10, cardY + 15, cardX + cardWidth - 10, cardY + 15);
         
-        // PHOTO SECTION - PERFECTLY CENTERED
-        const photoCenterY = cardY + 55;
+        // PHOTO SECTION - MIDDLE UPPER
+        const photoY = cardY + 28;
+        const photoSize = 25;
+        const photoX = centerX - photoSize / 2;
         
         if (formData.photoDataUrl) {
             try {
-                // Photo circle
-                doc.setFillColor(245, 245, 245);
-                doc.circle(centerX, photoCenterY, 16, 'F');
-                
-                // Photo border
+                // Add photo with border
                 doc.setDrawColor(37, 117, 252);
-                doc.setLineWidth(1.2);
-                doc.circle(centerX, photoCenterY, 16, 'S');
+                doc.setLineWidth(1);
+                doc.rect(photoX - 1, photoY - 1, photoSize + 2, photoSize + 2, 'S');
                 
-                // Add photo (centered within circle)
-                const photoSize = 30; // 30mm width/height
-                const photoX = centerX - photoSize / 2;
-                const photoY = photoCenterY - photoSize / 2;
-                
+                // Add the photo
                 doc.addImage(formData.photoDataUrl, 'JPEG', photoX, photoY, photoSize, photoSize);
             } catch (e) {
-                // Fallback if image error
-                doc.setTextColor(180, 180, 180);
-                doc.setFontSize(10);
-                doc.text("[PHOTO]", centerX, photoCenterY, { align: 'center' });
+                console.error("Error adding image:", e);
+                // Placeholder
+                doc.setFillColor(240, 240, 240);
+                doc.rect(photoX, photoY, photoSize, photoSize, 'F');
+                doc.setTextColor(150, 150, 150);
+                doc.setFontSize(8);
+                doc.text("PHOTO", centerX, photoY + 12, { align: 'center' });
             }
         }
         
-        // Student ID (below photo)
+        // Student ID - BELOW PHOTO
         doc.setTextColor(0, 0, 0);
-        doc.setFontSize(11);
-        doc.setFont("helvetica", "bold");
-        doc.text(`ID: ${studentId}`, centerX, photoCenterY + 25, { align: 'center' });
-        
-        // Name (centered, with line break if too long)
-        doc.setFontSize(16);
-        const nameLines = doc.splitTextToSize(fullName.toUpperCase(), cardWidth - 20);
-        doc.text(nameLines, centerX, photoCenterY + 38, { align: 'center' });
-        
-        // Details (left-aligned within card)
-        const detailStartX = cardX + 15;
-        let detailY = photoCenterY + 55;
-        
         doc.setFontSize(10);
+        doc.setFont("helvetica", "bold");
+        doc.text(`ID: ${studentId}`, centerX, photoY + 30, { align: 'center' });
+        
+        // Name - BELOW STUDENT ID
+        doc.setFontSize(14);
+        const nameLines = doc.splitTextToSize(fullName.toUpperCase(), cardWidth - 20);
+        const nameY = photoY + 40;
+        doc.text(nameLines, centerX, nameY, { align: 'center' });
+        
+        // Calculate name height for spacing
+        const nameHeight = nameLines.length * 5;
+        
+        // DETAILS SECTION - FIXED POSITIONS (NO OVERLAP)
+        const detailsStartY = nameY + nameHeight + 5;
+        doc.setFontSize(9);
         doc.setFont("helvetica", "normal");
         
-        // DOB
-        doc.text(`Date of Birth: ${formData.dob}`, detailStartX, detailY);
-        detailY += 7;
+        // Position 1: Date of Birth
+        doc.text(`Date of Birth: ${formData.dob}`, cardX + 10, detailsStartY);
         
-        // Phone
-        doc.text(`Phone: ${formData.phone}`, detailStartX, detailY);
-        detailY += 7;
+        // Position 2: Phone (6mm below DOB)
+        doc.text(`Phone: ${formData.phone}`, cardX + 10, detailsStartY + 6);
         
-        // Address (multi-line)
-        doc.text(`Address:`, detailStartX, detailY);
-        const addressLines = doc.splitTextToSize(formData.address, cardWidth - 25);
-        doc.text(addressLines, detailStartX + 5, detailY + 4);
+        // Position 3: Address label (6mm below Phone)
+        const addressLabelY = detailsStartY + 12;
+        doc.text(`Address:`, cardX + 10, addressLabelY);
         
-        // Footer
+        // Address text (indented right, limited to 3 lines max)
+        const addressLines = doc.splitTextToSize(formData.address, cardWidth - 20);
+        const maxAddressLines = Math.min(addressLines.length, 3);
+        const displayAddressLines = addressLines.slice(0, maxAddressLines);
+        
+        // Add address text 5mm to the right of label
+        doc.text(displayAddressLines, cardX + 15, addressLabelY + 4);
+        
+        // If address was truncated, add ellipsis
+        if (addressLines.length > 3) {
+            doc.text("...", cardX + 15, addressLabelY + 16);
+        }
+        
+        // FOOTER SECTION - BOTTOM
         doc.setFontSize(8);
         doc.setTextColor(100, 100, 100);
-        const issueDate = new Date().toLocaleDateString();
-        doc.text(`Issued: ${issueDate}`, detailStartX, cardY + cardHeight - 15);
+        doc.text(`Issued: ${new Date().toLocaleDateString()}`, cardX + 10, cardY + cardHeight - 8);
         
-        // University
+        // University name at bottom
         doc.setFontSize(9);
         doc.setTextColor(37, 117, 252);
-        doc.text("OFFICIAL ID CARD", centerX, cardY + cardHeight - 8, { align: 'center' });
+        doc.text("UNIVERSITY OF TECHNOLOGY", centerX, cardY + cardHeight - 3, { align: 'center' });
         
         // Card border
         doc.setDrawColor(200, 200, 200);
-        doc.setLineWidth(0.5);
-        doc.roundedRect(cardX, cardY, cardWidth, cardHeight, 8, 8, 'S');
+        doc.setLineWidth(0.3);
+        doc.roundedRect(cardX, cardY, cardWidth, cardHeight, 5, 5, 'S');
         
-        // Download
-        doc.save(`ID_${studentId}.pdf`);
+        // Download PDF
+        doc.save(`Student_ID_${studentId}.pdf`);
         
         // Visual feedback
         const originalText = downloadBtn.innerHTML;
@@ -343,7 +361,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
     
-    // Drag and drop for photo
+    // Drag and drop for photo upload
     const photoPreview = document.getElementById('photoPreview');
     
     photoPreview.addEventListener('dragover', function(e) {
