@@ -37,8 +37,15 @@ document.addEventListener("DOMContentLoaded", function () {
     // Generate a student ID
     function generateStudentId() {
         const year = new Date().getFullYear().toString().slice(-2);
-        const randomNum = Math.floor(1000 + Math.random() * 9000);
+        const randomNum = Math.floor(10000 + Math.random() * 90000);
         return `STU${year}${randomNum}`;
+    }
+    
+    // Format date from YYYY-MM-DD to DD/MM/YYYY
+    function formatDate(dateString) {
+        if (!dateString) return "";
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-GB'); // DD/MM/YYYY format
     }
     
     // Handle photo upload from file input
@@ -152,10 +159,10 @@ document.addEventListener("DOMContentLoaded", function () {
             <h4><i class="fas fa-id-badge"></i> Student ID Card</h4>
             <p><span class="label">Student ID:</span> ${studentId}</p>
             <p><span class="label">Full Name:</span> ${fullName}</p>
-            <p><span class="label">Date of Birth:</span> ${formData.dob || 'Not provided'}</p>
+            <p><span class="label">Date of Birth:</span> ${formatDate(formData.dob) || 'Not provided'}</p>
             <p><span class="label">Phone:</span> ${formData.phone || 'Not provided'}</p>
             <p><span class="label">Address:</span> ${formData.address || 'Not provided'}</p>
-            <p><span class="label">Date Issued:</span> ${new Date().toLocaleDateString()}</p>
+            <p><span class="label">Date Issued:</span> ${new Date().toLocaleDateString('en-GB')}</p>
         `;
     }
     
@@ -210,7 +217,7 @@ document.addEventListener("DOMContentLoaded", function () {
         previewContainer.scrollIntoView({ behavior: 'smooth' });
     });
     
-    // Handle PDF download with photo - FIXED VERSION (NO OVERLAPPING)
+    // Handle PDF download with photo - PROFESSIONAL VERSION
     downloadBtn.addEventListener("click", function () {
         // Check if form is submitted
         if (!studentId) {
@@ -230,125 +237,175 @@ document.addEventListener("DOMContentLoaded", function () {
         const pageHeight = 148;
         const centerX = pageWidth / 2;
         
-        // Blue background
-        doc.setFillColor(37, 117, 252);
+        // Add watermark "Made by Aman Minz" - FADED BACKGROUND
+        doc.setTextColor(220, 220, 220); // Very light gray
+        doc.setFontSize(24);
+        doc.setFont("helvetica", "italic");
+        doc.text("Made by Aman Minz", centerX, pageHeight / 2, { 
+            align: 'center',
+            angle: 45 // Diagonal watermark
+        });
+        
+        // Blue background with gradient effect
+        doc.setFillColor(20, 60, 150); // Darker blue for professional look
         doc.rect(0, 0, pageWidth, pageHeight, 'F');
         
-        // White ID card - centered with safe margins
-        const cardWidth = 85;
-        const cardHeight = 100;
+        // Add subtle pattern
+        doc.setDrawColor(255, 255, 255, 20); // Very transparent white
+        for(let i = 0; i < pageWidth; i += 15) {
+            for(let j = 0; j < pageHeight; j += 15) {
+                doc.circle(i, j, 0.5, 'F');
+            }
+        }
+        
+        // White ID card - centered with professional margins
+        const cardWidth = 90;
+        const cardHeight = 115;
         const cardX = (pageWidth - cardWidth) / 2;
         const cardY = (pageHeight - cardHeight) / 2;
         
+        // Card background with slight shadow effect
         doc.setFillColor(255, 255, 255);
-        doc.roundedRect(cardX, cardY, cardWidth, cardHeight, 5, 5, 'F');
+        doc.roundedRect(cardX, cardY, cardWidth, cardHeight, 8, 8, 'F');
         
-        // Title - TOP SECTION
-        doc.setTextColor(37, 117, 252);
-        doc.setFontSize(16);
+        // Card shadow
+        doc.setFillColor(0, 0, 0, 10);
+        doc.roundedRect(cardX + 2, cardY + 2, cardWidth, cardHeight, 8, 8, 'F');
+        
+        // Professional header with institution logo area
+        doc.setFillColor(37, 117, 252);
+        doc.roundedRect(cardX, cardY, cardWidth, 25, 8, 8, 'F');
+        
+        // Title with white text on blue background
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(18);
         doc.setFont("helvetica", "bold");
-        doc.text("STUDENT ID", centerX, cardY + 10, { align: 'center' });
+        doc.text("UNIVERSITY OF TECHNOLOGY", centerX, cardY + 15, { align: 'center' });
         
-        // Divider line
-        doc.setDrawColor(37, 117, 252);
-        doc.setLineWidth(0.5);
-        doc.line(cardX + 10, cardY + 15, cardX + cardWidth - 10, cardY + 15);
+        // Subtitle
+        doc.setFontSize(12);
+        doc.text("Student Identity Card", centerX, cardY + 22, { align: 'center' });
         
-        // PHOTO SECTION - MIDDLE UPPER
-        const photoY = cardY + 28;
-        const photoSize = 25;
+        // PHOTO SECTION - Professional passport photo
+        const photoY = cardY + 45;
+        const photoSize = 30;
         const photoX = centerX - photoSize / 2;
         
         if (formData.photoDataUrl) {
             try {
-                // Add photo with border
+                // Photo with professional frame
+                doc.setFillColor(240, 240, 240);
+                doc.roundedRect(photoX - 2, photoY - 2, photoSize + 4, photoSize + 4, 2, 2, 'F');
+                
+                // Photo border
                 doc.setDrawColor(37, 117, 252);
-                doc.setLineWidth(1);
-                doc.rect(photoX - 1, photoY - 1, photoSize + 2, photoSize + 2, 'S');
+                doc.setLineWidth(1.5);
+                doc.roundedRect(photoX - 2, photoY - 2, photoSize + 4, photoSize + 4, 2, 2, 'S');
                 
                 // Add the photo
                 doc.addImage(formData.photoDataUrl, 'JPEG', photoX, photoY, photoSize, photoSize);
             } catch (e) {
                 console.error("Error adding image:", e);
-                // Placeholder
+                // Professional placeholder
                 doc.setFillColor(240, 240, 240);
-                doc.rect(photoX, photoY, photoSize, photoSize, 'F');
+                doc.roundedRect(photoX, photoY, photoSize, photoSize, 2, 2, 'F');
                 doc.setTextColor(150, 150, 150);
                 doc.setFontSize(8);
-                doc.text("PHOTO", centerX, photoY + 12, { align: 'center' });
+                doc.text("PASSPORT PHOTO", centerX, photoY + 15, { align: 'center' });
             }
         }
         
-        // Student ID - BELOW PHOTO
-        doc.setTextColor(0, 0, 0);
-        doc.setFontSize(10);
+        // Student details section
+        const detailsStartX = cardX + 15;
+        const detailsStartY = photoY + photoSize + 15;
+        
+        // Student ID with badge style
+        doc.setFillColor(245, 245, 245);
+        doc.roundedRect(detailsStartX - 5, detailsStartY - 8, cardWidth - 20, 15, 3, 3, 'F');
+        
+        doc.setTextColor(37, 117, 252);
+        doc.setFontSize(11);
         doc.setFont("helvetica", "bold");
-        doc.text(`ID: ${studentId}`, centerX, photoY + 30, { align: 'center' });
+        doc.text(`STUDENT ID: ${studentId}`, centerX, detailsStartY, { align: 'center' });
         
-        // Name - BELOW STUDENT ID
-        doc.setFontSize(14);
-        const nameLines = doc.splitTextToSize(fullName.toUpperCase(), cardWidth - 20);
-        const nameY = photoY + 40;
-        doc.text(nameLines, centerX, nameY, { align: 'center' });
+        // Name section
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(16);
+        doc.setFont("helvetica", "bold");
+        const nameLines = doc.splitTextToSize(fullName.toUpperCase(), cardWidth - 30);
+        doc.text(nameLines, centerX, detailsStartY + 15, { align: 'center' });
         
-        // Calculate name height for spacing
-        const nameHeight = nameLines.length * 5;
-        
-        // DETAILS SECTION - FIXED POSITIONS (NO OVERLAP)
-        const detailsStartY = nameY + nameHeight + 5;
-        doc.setFontSize(9);
+        // Details grid - professional layout
+        const detailY = detailsStartY + 25 + (nameLines.length * 5);
+        doc.setFontSize(10);
         doc.setFont("helvetica", "normal");
         
-        // Position 1: Date of Birth
-        doc.text(`Date of Birth: ${formData.dob}`, cardX + 10, detailsStartY);
+        // Left column
+        doc.setTextColor(80, 80, 80);
+        doc.text("Date of Birth:", detailsStartX, detailY);
+        doc.text("Phone:", detailsStartX, detailY + 8);
+        doc.text("Address:", detailsStartX, detailY + 16);
         
-        // Position 2: Phone (6mm below DOB)
-        doc.text(`Phone: ${formData.phone}`, cardX + 10, detailsStartY + 6);
+        // Right column (values)
+        doc.setTextColor(0, 0, 0);
+        doc.setFont("helvetica", "bold");
+        doc.text(formatDate(formData.dob), detailsStartX + 35, detailY);
+        doc.text(formData.phone, detailsStartX + 35, detailY + 8);
         
-        // Position 3: Address label (6mm below Phone)
-        const addressLabelY = detailsStartY + 12;
-        doc.text(`Address:`, cardX + 10, addressLabelY);
-        
-        // Address text (indented right, limited to 3 lines max)
-        const addressLines = doc.splitTextToSize(formData.address, cardWidth - 20);
-        const maxAddressLines = Math.min(addressLines.length, 3);
-        const displayAddressLines = addressLines.slice(0, maxAddressLines);
-        
-        // Add address text 5mm to the right of label
-        doc.text(displayAddressLines, cardX + 15, addressLabelY + 4);
-        
-        // If address was truncated, add ellipsis
-        if (addressLines.length > 3) {
-            doc.text("...", cardX + 15, addressLabelY + 16);
+        // Address with proper formatting
+        const addressLines = doc.splitTextToSize(formData.address, cardWidth - 40);
+        const maxLines = Math.min(addressLines.length, 3);
+        for(let i = 0; i < maxLines; i++) {
+            doc.text(addressLines[i], detailsStartX + 35, detailY + 16 + (i * 4));
         }
         
-        // FOOTER SECTION - BOTTOM
-        doc.setFontSize(8);
-        doc.setTextColor(100, 100, 100);
-        doc.text(`Issued: ${new Date().toLocaleDateString()}`, cardX + 10, cardY + cardHeight - 8);
+        // Footer section with issue date and signature area
+        const footerY = cardY + cardHeight - 15;
         
-        // University name at bottom
+        // Horizontal line
+        doc.setDrawColor(200, 200, 200);
+        doc.setLineWidth(0.3);
+        doc.line(detailsStartX, footerY, cardX + cardWidth - 15, footerY);
+        
+        // Issue date
+        doc.setTextColor(100, 100, 100);
         doc.setFontSize(9);
-        doc.setTextColor(37, 117, 252);
-        doc.text("UNIVERSITY OF TECHNOLOGY", centerX, cardY + cardHeight - 3, { align: 'center' });
+        doc.setFont("helvetica", "normal");
+        doc.text(`Date Issued: ${new Date().toLocaleDateString('en-GB')}`, detailsStartX, footerY + 5);
+        
+        // Valid until (1 year from issue)
+        const validDate = new Date();
+        validDate.setFullYear(validDate.getFullYear() + 1);
+        doc.text(`Valid Until: ${validDate.toLocaleDateString('en-GB')}`, detailsStartX, footerY + 10);
+        
+        // Signature area
+        doc.text("Registrar's Signature", cardX + cardWidth - 50, footerY + 10, { align: 'right' });
+        doc.setDrawColor(150, 150, 150);
+        doc.line(cardX + cardWidth - 50, footerY + 12, cardX + cardWidth - 15, footerY + 12);
         
         // Card border
         doc.setDrawColor(200, 200, 200);
-        doc.setLineWidth(0.3);
-        doc.roundedRect(cardX, cardY, cardWidth, cardHeight, 5, 5, 'S');
+        doc.setLineWidth(0.5);
+        doc.roundedRect(cardX, cardY, cardWidth, cardHeight, 8, 8, 'S');
         
-        // Download PDF
-        doc.save(`Student_ID_${studentId}.pdf`);
+        // Security features - subtle pattern
+        doc.setDrawColor(37, 117, 252, 10);
+        for(let i = 0; i < 5; i++) {
+            doc.circle(cardX + 10 + (i * 15), cardY + cardHeight - 5, 1, 'F');
+        }
+        
+        // Download PDF with professional filename
+        doc.save(`University_ID_${studentId}.pdf`);
         
         // Visual feedback
         const originalText = downloadBtn.innerHTML;
-        downloadBtn.innerHTML = '<i class="fas fa-check"></i> Downloaded!';
+        downloadBtn.innerHTML = '<i class="fas fa-check"></i> ID Card Downloaded!';
         downloadBtn.style.background = '#6a11cb';
         
         setTimeout(() => {
             downloadBtn.innerHTML = originalText;
             downloadBtn.style.background = '#00c896';
-        }, 1500);
+        }, 2000);
     });
     
     // Initialize student ID
@@ -384,4 +441,20 @@ document.addEventListener("DOMContentLoaded", function () {
             handlePhotoFile(e.dataTransfer.files[0]);
         }
     });
+    
+    // Format date input display
+    const dobInput = document.getElementById('dob');
+    if (dobInput) {
+        // Set max date to today
+        const today = new Date().toISOString().split('T')[0];
+        dobInput.max = today;
+        
+        // Format display on change
+        dobInput.addEventListener('change', function() {
+            if (this.value) {
+                const formattedDate = formatDate(this.value);
+                // You can display this somewhere if needed
+            }
+        });
+    }
 });
