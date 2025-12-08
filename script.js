@@ -134,8 +134,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const fullName = `${formData.firstName || ''} ${formData.middleName || ''} ${formData.lastName || ''}`.trim();
         
         previewDetails.innerHTML = `
-            <h4>Student ID Card Preview</h4>
-            <p><span class="label">Student ID:</span> ${studentId}</p>
+            <h4>ID Card Preview</h4>
+            <p><span class="label">ID:</span> ${studentId}</p>
             <p><span class="label">Name:</span> ${fullName}</p>
             <p><span class="label">Date of Birth:</span> ${formatDate(formData.dob)}</p>
             <p><span class="label">Phone:</span> ${formData.phone}</p>
@@ -181,7 +181,7 @@ document.addEventListener("DOMContentLoaded", function () {
         submitBtn.style.background = '#00c896';
         
         setTimeout(() => {
-            submitBtn.innerHTML = '<i class="fas fa-check-circle"></i> Update Info';
+            submitBtn.innerHTML = '<i class="fas fa-check-circle"></i> Update';
         }, 2000);
         
         // Show preview
@@ -190,7 +190,7 @@ document.addEventListener("DOMContentLoaded", function () {
         previewContainer.scrollIntoView({ behavior: 'smooth' });
     });
     
-    // SIMPLE PDF GENERATION
+    // MINIMAL PDF GENERATION - No university text
     downloadBtn.addEventListener("click", function () {
         if (!studentId) {
             alert("Please submit form first");
@@ -198,112 +198,111 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('p', 'mm', 'a6');
+        const doc = new jsPDF('p', 'mm', 'a6'); // 105x148mm
         
         const fullName = `${formData.firstName} ${formData.middleName} ${formData.lastName}`.trim();
-        const pageWidth = 105;
-        const pageHeight = 148;
-        const centerX = pageWidth / 2;
         
         // Simple white background
         doc.setFillColor(255, 255, 255);
-        doc.rect(0, 0, pageWidth, pageHeight, 'F');
+        doc.rect(0, 0, 105, 148, 'F');
         
-        // Thin border around page
+        // Thin border around entire page
         doc.setDrawColor(200, 200, 200);
         doc.setLineWidth(0.3);
-        doc.rect(5, 5, pageWidth - 10, pageHeight - 10, 'S');
+        doc.rect(5, 5, 95, 138, 'S');
         
-        // Title
+        // Simple title at top
         doc.setTextColor(50, 50, 50);
-        doc.setFontSize(16);
+        doc.setFontSize(14);
         doc.setFont("helvetica", "bold");
-        doc.text("STUDENT ID CARD", centerX, 20, { align: 'center' });
+        doc.text("STUDENT ID CARD", 52.5, 15, { align: 'center' });
         
-        // Thin separator line
-        doc.setDrawColor(100, 100, 100);
+        // Thin line under title
+        doc.setDrawColor(150, 150, 150);
         doc.setLineWidth(0.2);
-        doc.line(20, 25, 85, 25);
+        doc.line(20, 18, 85, 18);
         
-        // RECTANGULAR PHOTO (not circle)
+        // RECTANGULAR PHOTO - left side
         const photoX = 15;
-        const photoY = 35;
+        const photoY = 30;
         const photoWidth = 35;
         const photoHeight = 45;
         
         if (formData.photoDataUrl) {
             try {
-                // Simple rectangular photo with thin border
+                // Add photo with thin border
                 doc.setDrawColor(100, 100, 100);
                 doc.setLineWidth(0.5);
                 doc.rect(photoX, photoY, photoWidth, photoHeight, 'S');
                 
-                // Add photo
+                // Add the photo
                 doc.addImage(formData.photoDataUrl, 'JPEG', photoX, photoY, photoWidth, photoHeight);
             } catch (e) {
-                // Placeholder rectangle
+                // Placeholder
                 doc.setFillColor(240, 240, 240);
                 doc.rect(photoX, photoY, photoWidth, photoHeight, 'F');
-                doc.setTextColor(150, 150, 150);
+                doc.setTextColor(180, 180, 180);
                 doc.setFontSize(8);
-                doc.text("PHOTO", photoX + photoWidth/2, photoY + photoHeight/2, { align: 'center' });
+                doc.text("PHOTO", photoX + 17.5, photoY + 22.5, { align: 'center' });
             }
         }
         
-        // Student details on right side of photo
+        // Details on right side of photo
         const detailsX = 55;
-        let detailsY = 40;
-        
-        doc.setTextColor(0, 0, 0);
-        doc.setFontSize(10);
-        doc.setFont("helvetica", "normal");
+        let detailsY = 35;
         
         // Student ID
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(10);
         doc.setFont("helvetica", "bold");
         doc.text(`ID: ${studentId}`, detailsX, detailsY);
-        detailsY += 7;
+        detailsY += 8;
         
         // Name
         doc.setFontSize(12);
         doc.text(fullName, detailsX, detailsY);
-        detailsY += 10;
+        detailsY += 12;
         
         // Other details
         doc.setFontSize(9);
         doc.setFont("helvetica", "normal");
         
         // Date of Birth
-        doc.text(`DOB: ${formatDate(formData.dob)}`, detailsX, detailsY);
+        doc.text(`Date of Birth:`, detailsX, detailsY);
+        doc.text(formatDate(formData.dob), detailsX + 28, detailsY);
         detailsY += 6;
         
         // Phone
-        doc.text(`Phone: ${formData.phone}`, detailsX, detailsY);
+        doc.text(`Phone:`, detailsX, detailsY);
+        doc.text(formData.phone, detailsX + 28, detailsY);
         detailsY += 6;
         
-        // Address (simple, 2 lines max)
-        doc.text("Address:", detailsX, detailsY);
-        const addressLines = doc.splitTextToSize(formData.address, 40);
-        const displayLines = addressLines.slice(0, 2);
-        doc.text(displayLines, detailsX, detailsY + 4);
+        // Address
+        doc.text(`Address:`, detailsX, detailsY);
+        const addressLines = doc.splitTextToSize(formData.address, 38);
+        const displayLines = addressLines.slice(0, 2); // Max 2 lines
+        for(let i = 0; i < displayLines.length; i++) {
+            doc.text(displayLines[i], detailsX + 28, detailsY + (i * 4));
+        }
         
-        // Issuing date at bottom
+        // Thin border around content area
+        doc.setDrawColor(180, 180, 180);
+        doc.setLineWidth(0.5);
+        doc.rect(10, 25, 85, 75, 'S');
+        
+        // Issue date at bottom
         const issueDate = new Date().toLocaleDateString('en-GB');
         doc.setFontSize(8);
         doc.setTextColor(100, 100, 100);
-        doc.text(`Issued: ${issueDate}`, 15, 100);
+        doc.text(`Issued: ${issueDate}`, 52.5, 115, { align: 'center' });
         
-        // Simple footer
+        // Very simple footer
         doc.setFontSize(9);
-        doc.setTextColor(50, 50, 50);
-        doc.text("Official Student ID", centerX, 110, { align: 'center' });
-        
-        // Thin border around card area
-        doc.setDrawColor(150, 150, 150);
-        doc.setLineWidth(0.5);
-        doc.rect(10, 30, 85, 85, 'S');
+        doc.setTextColor(80, 80, 80);
+        doc.text("Valid Student Identification", 52.5, 122, { align: 'center' });
         
         // Download
-        doc.save(`Student_ID_${studentId}.pdf`);
+        doc.save(`ID_${studentId}.pdf`);
         
         // Feedback
         downloadBtn.innerHTML = '<i class="fas fa-check"></i> Downloaded';
